@@ -6,10 +6,10 @@
     <AssemblyName>Brotal.FireflyIII</AssemblyName>
     <PackageId>Brotal.FireflyIII</PackageId>
     <OutputType>Library</OutputType>
-    <Authors>OpenAPI</Authors>
-    <Company>OpenAPI</Company>
-    <AssemblyTitle>OpenAPI Library</AssemblyTitle>
-    <Description>A library generated from a OpenAPI doc</Description>
+    <Authors>Shakib Haris</Authors>
+    <Company>Brotal</Company>
+    <AssemblyTitle>Brotal.FireflyIII</AssemblyTitle>
+    <Description>A library generated from a OpenAPI doc for Firefly-III</Description>
     <Copyright>No Copyright</Copyright>
     <RootNamespace>Brotal.FireflyIII</RootNamespace>
     <Version>1.0.0</Version>

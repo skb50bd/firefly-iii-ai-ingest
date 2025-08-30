@@ -31,12 +31,14 @@ public sealed class AiService(IChatClient chatClient)
             };
         }
 
+        response.Result.Draft!.Tags = ["AI", .. response.Result.Draft?.Tags];
+
         return response.Result;
     }
 
     private static string GetSystemPrompt(FireflyContextSnapshot context)
     {
-        var categories      = string.Join(", ", context.Categories.Select(c => c.Attributes.Name));
+        var categories      = string.Join(", ", context.Categories.Select(c => new { c.Attributes.Name }));
         var assets          = string.Join(", ", context.AssetAccounts.Select(a => new { a.Attributes.Name, a.Attributes.AccountNumber, a.Attributes.CurrencyCode }));
         var expenses        = string.Join(", ", context.ExpenseAccounts.Select(a => new { a.Attributes.Name, a.Attributes.AccountNumber, a.Attributes.CurrencyCode }));
         var liabilities     = string.Join(", ", context.LiabilityAccounts.Select(a => new { a.Attributes.Name, a.Attributes.AccountNumber, a.Attributes.CurrencyCode, a.Attributes.LiabilityDirection }));
@@ -47,10 +49,12 @@ public sealed class AiService(IChatClient chatClient)
 
         var prompt = $$$"""
             You are an assistant that extracts financial transactions from arbitrary text (SMS, email, or user notes) for Firefly-III.
-            If the text is not a financial transaction, respond with JSON: {{""isTransactional"": false, ""isConfident"": true, ""reason"": ""not a transaction""}}
-            If it is a transaction, respond accordingly with best matches. You can set properties to null, where you are not confident about the values.
+            If the text is not a financial transaction, respond with isTransactional: false, isConfident: true, reason: not a transaction
+            If it is a transaction, respond accordingly with best matches from the context. 
+            Use exactly same names for corresponding properties preserving casing.
+            You can set properties to null, where you are not confident about the values.
             Include the original text in the notes field.
-            Available context (choose best matches):
+            Available context (choose best matches, use exact names):
             ---
             Categories: {{{categories}}}
             Asset accounts: {{{assets}}}

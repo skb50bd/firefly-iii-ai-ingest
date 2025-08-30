@@ -61,7 +61,10 @@ public sealed class FireflyClient : IDisposable, IAsyncDisposable
 
     public async Task<FireflyContextSnapshot> FetchContextFromApiAsync(CancellationToken cancellationToken)
     {
-        var accountsTask = _accountsApi.ListAccountAsync(cancellationToken: cancellationToken);
+        var assetAccountsTask = _accountsApi.ListAccountAsync(limit:500, type: AccountTypeFilter.Asset, cancellationToken: cancellationToken);
+        var expenseAccountsTask = _accountsApi.ListAccountAsync(limit:500, type: AccountTypeFilter.Expense, cancellationToken: cancellationToken);
+        var liabilitiesAccountsTask = _accountsApi.ListAccountAsync(limit:500, type: AccountTypeFilter.Liabilities, cancellationToken: cancellationToken);
+        var revenueAccountsTask = _accountsApi.ListAccountAsync(limit:500, type: AccountTypeFilter.Revenue, cancellationToken: cancellationToken);
         var categoriesTask = _categoriesApi.ListCategoryAsync(cancellationToken: cancellationToken);
         var tagsTask = _tagsApi.ListTagAsync(cancellationToken: cancellationToken);
         var budgetsTask = _budgetsApi.ListBudgetAsync(cancellationToken: cancellationToken);
@@ -69,7 +72,10 @@ public sealed class FireflyClient : IDisposable, IAsyncDisposable
         var billsTask = _billsApi.ListBillAsync(cancellationToken: cancellationToken);
 
         await Task.WhenAll(
-            accountsTask,
+            assetAccountsTask,
+            expenseAccountsTask,
+            liabilitiesAccountsTask,
+            revenueAccountsTask,
             categoriesTask,
             tagsTask,
             budgetsTask,
@@ -79,7 +85,10 @@ public sealed class FireflyClient : IDisposable, IAsyncDisposable
 
         _logger.LogInformation("Fetched context from Firefly III API");
 
-        var accountsResponse = accountsTask.Result;
+        var assetAccountsResponse = assetAccountsTask.Result;
+        var expenseAccountsResponse = expenseAccountsTask.Result;
+        var liabilitiesAccountsResponse = liabilitiesAccountsTask.Result;
+        var revenueAccountsResponse = revenueAccountsTask.Result;
         var categoriesResponse = categoriesTask.Result;
         var tagsResponse = tagsTask.Result;
         var budgetsResponse = budgetsTask.Result;
@@ -87,7 +96,10 @@ public sealed class FireflyClient : IDisposable, IAsyncDisposable
         var billsResponse = billsTask.Result;
 
         if ((
-                accountsResponse.TryOk(out var accounts) && accounts is not null &&
+                assetAccountsResponse.TryOk(out var assets) && assets is not null &&
+                expenseAccountsResponse.TryOk(out var expenses) && expenses is not null &&
+                liabilitiesAccountsResponse.TryOk(out var liabilities) && liabilities is not null &&
+                revenueAccountsResponse.TryOk(out var revenues) && revenues is not null &&
                 categoriesResponse.TryOk(out var categories) && categories is not null &&
                 tagsResponse.TryOk(out var tags) && tags is not null &&
                 budgetsResponse.TryOk(out var budgets) && budgets is not null &&
@@ -102,10 +114,10 @@ public sealed class FireflyClient : IDisposable, IAsyncDisposable
 
         return new FireflyContextSnapshot
         {
-            AssetAccounts = accounts.Data.Where(a => a.Attributes.Type == ShortAccountTypeProperty.Asset).ToList(),
-            ExpenseAccounts = accounts.Data.Where(a => a.Attributes.Type == ShortAccountTypeProperty.Expense).ToList(),
-            LiabilityAccounts = accounts.Data.Where(a => a.Attributes.Type == ShortAccountTypeProperty.Liabilities).ToList(),
-            RevenueAccounts = accounts.Data.Where(a => a.Attributes.Type == ShortAccountTypeProperty.Revenue).ToList(),
+            AssetAccounts = assets.Data,
+            ExpenseAccounts = expenses.Data,
+            LiabilityAccounts = liabilities.Data,
+            RevenueAccounts = revenues.Data,
             Categories = categories.Data,
             Tags = tags.Data,
             Budgets = budgets.Data,
