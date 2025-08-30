@@ -55,7 +55,7 @@ AUTHENTICATION__ENABLED=false
 ### 3. Start the Services
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 This will start:
@@ -67,7 +67,7 @@ This will start:
 If you're using Ollama, you'll need to pull a model:
 
 ```bash
-docker exec -it ollama ollama pull gemma2:2b
+docker exec -it ollama ollama pull gemma3:1b
 ```
 
 ### 5. Test the Service
@@ -77,7 +77,7 @@ Send a test transaction:
 ```bash
 curl -X POST http://localhost:5000/txn \
   -H "Content-Type: application/json" \
-  -d '{"text": "Bought groceries at Walmart for $45.67"}'
+  -d '{"text": "Bought groceries at Walmart for $45.67 with Cash"}'
 ```
 
 ## Configuration Options
@@ -103,8 +103,8 @@ OPENAI__MODEL=gpt-4o-mini
 
 ```env
 AIPROVIDER=Ollama
-OLLAMA__URL=http://ollama:11434
-OLLAMA__MODEL=gemma2:2b
+OLLAMA__URI=http://ollama:11434
+OLLAMA__MODEL=gemma3:1b
 ```
 
 ### Authentication Settings
@@ -113,7 +113,8 @@ Enable API key authentication:
 
 ```env
 AUTHENTICATION__ENABLED=true
-AUTHENTICATION__APIKEYS=your-api-key-here,another-api-key-here
+AUTHENTICATION__APIKEYS__0=your-api-key-here
+AUTHENTICATION__APIKEYS__1=another-api-key-here
 ```
 
 Enable basic authentication:
@@ -183,23 +184,13 @@ curl -X POST http://localhost:5000/txn \
 docker build -t firefly-buddy .
 
 # Run with docker-compose
-docker-compose up -d
+docker compose up -d
 
 # View logs
-docker-compose logs -f firefly-buddy
+docker compose logs -f firefly-buddy
 
 # Stop services
-docker-compose down
-```
-
-### Development
-
-```bash
-# Run in development mode
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
-
-# Rebuild after code changes
-docker-compose build --no-cache firefly-buddy
+docker compose down
 ```
 
 ### Ollama Management
@@ -212,7 +203,7 @@ docker exec -it ollama ollama pull llama3.1:8b
 docker exec -it ollama ollama list
 
 # Remove a model
-docker exec -it ollama ollama rm gemma2:2b
+docker exec -it ollama ollama rm gemma3:1b
 ```
 
 ## Health Checks
@@ -225,7 +216,7 @@ The service includes health checks for both containers:
 Monitor health status:
 
 ```bash
-docker-compose ps
+docker compose ps
 ```
 
 ## Troubleshooting
@@ -242,7 +233,7 @@ docker-compose ps
    - Check model name in configuration matches available models
 
 3. **Service Won't Start**
-   - Check logs: `docker-compose logs firefly-buddy`
+   - Check logs: `docker compose logs firefly-buddy`
    - Verify environment variables are set correctly
    - Ensure ports are not already in use
 
@@ -254,10 +245,10 @@ docker-compose ps
 
 ```bash
 # View service logs
-docker-compose logs -f firefly-buddy
+docker compose logs -f firefly-buddy
 
 # View Ollama logs
-docker-compose logs -f ollama
+docker compose logs -f ollama
 
 # Access container shell
 docker exec -it firefly-buddy /bin/bash
@@ -269,6 +260,7 @@ docker exec -it firefly-buddy /bin/bash
 2. **Network Security**: Consider using Docker networks to isolate services
 3. **Authentication**: Enable authentication in production environments
 4. **API Keys**: Use strong, unique API keys and rotate them regularly
+5. **SSL/TLS**: Consider using SSL/TLS to secure the communication between the service and Firefly III
 
 ## Contributing
 

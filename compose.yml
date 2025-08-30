@@ -1,7 +1,7 @@
 services:
   firefly-buddy:
     container_name: firefly-buddy
-    image: ghcr.io/skb50bd/firefly-buddy:latest
+    image: ghcr.io/skb50bd/firefly-iii-ai-ingest:latest
     build:
       context: .
       dockerfile: Dockerfile
