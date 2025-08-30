@@ -15,11 +15,14 @@ builder.Services.AddOpenApi();
 var fireflyOptions = builder.Configuration.GetSection("Firefly").Get<FireflyOptions>()
     ?? throw new InvalidOperationException("Firefly configuration is missing.");
 
+var authOptions = builder.Configuration.GetSection("Authentication").Get<AuthenticationOptions>()
+    ?? new AuthenticationOptions();
+
 var aiProvider = builder.Configuration.GetValue<string>("AiProvider");
 
 if (aiProvider?.Equals("OpenAI", StringComparison.OrdinalIgnoreCase) ?? false)
 {
-    var openAiOptions = 
+    var openAiOptions =
         builder.Configuration.GetSection("OpenAI").Get<OpenAiOptions>()
             ?? throw new InvalidOperationException("OpenAI configuration is missing.");
 
@@ -102,6 +105,7 @@ builder.Services.AddApi(options =>
 
 builder.Services
     .AddSingleton(fireflyOptions)
+    .AddSingleton(authOptions)
     .AddSingleton<AiService>()
     .AddSingleton<FireflyClient>();
 
@@ -111,6 +115,9 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+// Add authentication middleware
+app.UseCustomAuthentication();
 
 // app.UseHttpsRedirection();
 
@@ -149,7 +156,8 @@ app.MapPost("/txn", async (
             logger.LogInformation(" - No draft provided.");
         }
     }
-    return message;
+
+    return analysis;
 })
 .WithName("Record Txn");
 

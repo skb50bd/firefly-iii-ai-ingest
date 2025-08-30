@@ -2,7 +2,7 @@ using Microsoft.Extensions.AI;
 
 namespace Brotal.FireflyBuddy;
 
-public sealed class AiService(IChatClient chatClient)
+public sealed class AiService(IChatClient chatClient, ILogger<AiService> logger)
 {
     public async Task<AiClassificationResult> AnalyzeAsync(
         string rawText,
@@ -16,9 +16,16 @@ public sealed class AiService(IChatClient chatClient)
             new(ChatRole.User, rawText)
         };
 
+        logger.LogInformation("Getting Response from AI");
         var response = await chatClient.GetResponseAsync<AiClassificationResult>(
             messages,
             cancellationToken: cancellationToken
+        );
+
+        logger.LogInformation(
+            "Received AI Response. IsTransactional: {isTransactional}, Reason: {reason}",
+            response.Result.IsTransactional,
+            response.Result.Reason
         );
 
         if (response.Result is null)
@@ -51,9 +58,9 @@ public sealed class AiService(IChatClient chatClient)
             You are an assistant that extracts financial transactions from arbitrary text (SMS, email, or user notes) for Firefly-III.
             If the text is not a financial transaction, respond with isTransactional: false, isConfident: true, reason: not a transaction
             If it is a transaction, respond accordingly with best matches from the context. 
-            Use exactly same names for corresponding properties preserving casing.
+            Transactions can be of type Withdrawal, Deposit, Transfer
+            For Withdrawal, set DestinationAccountName to an appropriate Expense account or keep empty, and SourceAccountName to an appropriate Asset account..
             You can set properties to null, where you are not confident about the values.
-            Include the original text in the notes field.
             Available context (choose best matches, use exact names):
             ---
             Categories: {{{categories}}}

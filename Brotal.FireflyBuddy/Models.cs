@@ -24,6 +24,19 @@ public sealed class FireflyOptions
     public string PersonalAccessToken { get; set; } = string.Empty;
 }
 
+public sealed class AuthenticationOptions
+{
+    public bool Enabled { get; set; } = false;
+    public string[] ApiKeys { get; set; } = [];
+    public BasicAuthOptions? BasicAuth { get; set; }
+}
+
+public sealed class BasicAuthOptions
+{
+    public string Username { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+}
+
 public sealed class AiClassificationResult
 {
     [JsonPropertyName("isTransactional")]
@@ -47,7 +60,7 @@ public sealed class TransactionDraft
 
     [JsonPropertyName("description")]
     public string Description { get; set; } = string.Empty;
-    
+
     [JsonPropertyName("date")]
     public DateTimeOffset Date { get; set; } = DateTimeOffset.UtcNow;
 
