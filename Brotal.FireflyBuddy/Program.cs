@@ -56,6 +56,10 @@ app.UseCustomAuthentication();
 
 // app.UseHttpsRedirection();
 
+// Health check endpoint
+app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }))
+    .WithName("Health Check");
+
 app.MapPost("/txn", async (
     [FromBody]      IngestMessage message,
     [FromServices]  AiService ai,
