@@ -2,7 +2,7 @@ name: Build & Push Docker image to GHCR
 
 on:
   push:
-    branches: [ "main", "docker-support" ]
+    branches: [ "main" ]
   release:
     types: [published]   # when you publish a GitHub Release
 
