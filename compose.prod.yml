@@ -1,0 +1,57 @@
+services:
+  firefly-buddy:
+    container_name: firefly-buddy
+    image: ghcr.io/skb50bd/firefly-iii-ai-ingest:latest
+    ports:
+      - "11433:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80
+    env_file:
+      - .env
+    depends_on:
+      - ollama
+    networks:
+      - firefly-network
+      - ingress
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+  ollama:
+    container_name: ollama
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - /data/containers/ollama:/root/.ollama
+      - /dev/dri:/dev/dri
+    networks:
+      - firefly-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+networks:
+  firefly-network:
+    driver: bridge
+  ingress:
+    external: true
