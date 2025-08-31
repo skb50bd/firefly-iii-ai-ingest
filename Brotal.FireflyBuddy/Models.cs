@@ -13,7 +13,7 @@ public sealed class OpenAiOptions
 
 public sealed class OllamaOptions
 {
-    public string Uri { get; set; } = string.Empty;
+    public string Url { get; set; } = string.Empty;
     public string ApiKey { get; set; } = string.Empty;
     public string Model { get; set; } = "gemma3:1b";
 }

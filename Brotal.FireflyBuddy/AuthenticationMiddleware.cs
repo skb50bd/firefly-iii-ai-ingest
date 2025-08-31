@@ -58,7 +58,7 @@ public class AuthenticationMiddleware
         {
             _logger.LogWarning("Authentication failed for request to {Path}", context.Request.Path);
             context.Response.StatusCode = 401;
-            context.Response.Headers.Add("WWW-Authenticate", "Basic realm=\"FireflyBuddy API\"");
+            context.Response.Headers.Append("WWW-Authenticate", "Basic realm=\"FireflyBuddy API\"");
             await context.Response.WriteAsync("Unauthorized");
             return;
         }

@@ -1,8 +1,10 @@
+using GeminiDotnet;
+using GeminiDotnet.Extensions.AI;
 using Microsoft.Extensions.AI;
 
 namespace Brotal.FireflyBuddy;
 
-public sealed class AiService(IChatClient chatClient, ILogger<AiService> logger)
+public sealed class AiService(IChatClient chatClient, IServiceProvider serviceProvider, ILogger<AiService> logger)
 {
     public async Task<AiClassificationResult> AnalyzeAsync(
         string rawText,
@@ -10,12 +12,21 @@ public sealed class AiService(IChatClient chatClient, ILogger<AiService> logger)
         CancellationToken cancellationToken
     )
     {
+        if (chatClient is GeminiChatClient)
+        {
+            var geminiClient = serviceProvider.GetService<GeminiClient>();
+            var geminiResponse = await geminiClient!.GetResponseAsync<AiClassificationResult>(
+                rawText,
+                cancellationToken
+            );
+        }
+        
         var messages = new List<ChatMessage>
         {
             new(ChatRole.System, GetSystemPrompt(context)),
             new(ChatRole.User, rawText)
         };
-
+        
         logger.LogInformation("Getting Response from AI");
         var response = await chatClient.GetResponseAsync<AiClassificationResult>(
             messages,
@@ -28,17 +39,20 @@ public sealed class AiService(IChatClient chatClient, ILogger<AiService> logger)
             response.Result.Reason
         );
 
-        if (response.Result is null)
+        if (response?.Result?.Draft is null)
         {
             return new AiClassificationResult
             {
                 IsTransactional = false,
                 IsConfident     = false,
-                Reason          = "Unparseable model response"
+                Reason          = response?.Result?.Reason ?? "Unparseable model response"
             };
         }
 
-        response.Result.Draft!.Tags = ["AI", .. response.Result.Draft?.Tags];
+        if (response.Result.Draft is not null)
+        {
+            response.Result.Draft.Tags = ["AI", .. response.Result.Draft.Tags];
+        }
 
         return response.Result;
     }
@@ -56,13 +70,12 @@ public sealed class AiService(IChatClient chatClient, ILogger<AiService> logger)
 
         var prompt = $$$"""
             You are an assistant that extracts financial transactions from arbitrary text (SMS, email, or user notes) for Firefly-III.
-            If the text is not a financial transaction, respond with isTransactional: false, isConfident: true, reason: not a transaction
-            If it is a transaction, respond accordingly with best matches from the context. 
+            If the text is not a financial transaction, respond with isTransactional: false, isConfident: true, reason: "not a transaction"
+            If it is a transaction, respond accordingly with best matches from the context, and populate the `draft` object properties.
             Transactions can be of type Withdrawal, Deposit, Transfer
-            For Withdrawal, set DestinationAccountName to an appropriate Expense account or keep empty, and SourceAccountName to an appropriate Asset account..
-            You can set properties to null, where you are not confident about the values.
-            Available context (choose best matches, use exact names):
+            For Withdrawal, set DestinationAccountName to an appropriate Expense account or keep empty, and SourceAccountName to an appropriate Asset account.
             ---
+            Context (choose best matches, use exact names):
             Categories: {{{categories}}}
             Asset accounts: {{{assets}}}
             Expense accounts: {{{expenses}}}
@@ -71,9 +84,8 @@ public sealed class AiService(IChatClient chatClient, ILogger<AiService> logger)
             Subscriptions: {{{subscriptions}}}
             Budgets: {{{budgets}}}
             Tags: {{{tags}}}
-            ---
             """;
 
         return prompt;
-    }    
+    }
 }
