@@ -10,7 +10,6 @@ WORKDIR /src
 
 # Copy the project files
 COPY ["Brotal.FireflyBuddy/Brotal.FireflyBuddy.csproj", "Brotal.FireflyBuddy/"]
-COPY ["Brotal.FireflyIII/src/Brotal.FireflyIII/Brotal.FireflyIII.csproj", "Brotal.FireflyIII/src/Brotal.FireflyIII/"]
 
 # Restore dependencies
 RUN dotnet restore "Brotal.FireflyBuddy/Brotal.FireflyBuddy.csproj"
