@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.AI;
+﻿using GeminiDotnet;
+using GeminiDotnet.Extensions.AI;
+using Microsoft.Extensions.AI;
 using OllamaSharp;
 using OpenAI;
 
@@ -55,21 +57,40 @@ public static class AiExtensions
                 throw new InvalidOperationException("Ollama model is not configured. Please set the 'Ollama:Model' configuration value.");
             }
 
-            if (string.IsNullOrWhiteSpace(ollamaOptions.Uri))
+            if (string.IsNullOrWhiteSpace(ollamaOptions.Url))
             {
-                throw new InvalidOperationException("Ollama Uri is not configured. Please set the 'Ollama:Uri' configuration value.");
+                throw new InvalidOperationException("Ollama Url is not configured. Please set the 'Ollama:Url' configuration value.");
             }
 
             var chatClient =
-                new OllamaApiClient(new Uri(ollamaOptions.Uri), ollamaOptions.Model);
+                new OllamaApiClient(new Uri(ollamaOptions.Url), ollamaOptions.Model);
 
             builder.Services
                 .AddSingleton(ollamaOptions)
                 .AddSingleton<IChatClient>(chatClient);
         }
+        else if (aiProvider?.Equals("Gemini", StringComparison.OrdinalIgnoreCase) ?? false)
+        {
+            var geminiOptions =
+                builder.Configuration.GetSection("Gemini").Get<GeminiClientOptions>()
+                    ?? throw new InvalidOperationException("Gemini configuration is missing.");
+
+            if (string.IsNullOrWhiteSpace(geminiOptions.ApiKey))
+            {
+                throw new InvalidOperationException("Gemini API key is not configured. Please set the 'Gemini:ApiKey' configuration value.");
+            }
+
+            var geminiClient = new GeminiClient(geminiOptions);
+            var chatClient = new GeminiChatClient(geminiOptions);
+
+            builder.Services
+                .AddSingleton(geminiOptions)
+                .AddSingleton(geminiClient)
+                .AddSingleton<IChatClient>(chatClient);
+        }
         else
         {
-            throw new InvalidOperationException($"Unsupported AI provider: {aiProvider}. Supported providers are: OpenAI, Ollama");
+            throw new InvalidOperationException($"Unsupported AI provider: {aiProvider}. Supported providers are: OpenAI, Ollama, Gemini");
         }
 
         return builder;

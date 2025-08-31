@@ -5,7 +5,7 @@ A .NET 9.0 web service that uses AI to automatically categorize and create trans
 ## Features
 
 - **AI-Powered Transaction Processing**: Automatically analyzes transaction descriptions and creates categorized transactions in Firefly III
-- **Multiple AI Providers**: Support for both OpenAI and Ollama (local AI models)
+- **Multiple AI Providers**: Support for both OpenAI, Gemini and Ollama (local AI models)
 - **Flexible Authentication**: Optional API key or basic authentication
 - **Docker Support**: Easy deployment with Docker and Docker Compose
 - **Health Checks**: Built-in health monitoring for containerized deployments
@@ -15,7 +15,7 @@ A .NET 9.0 web service that uses AI to automatically categorize and create trans
 - Docker and Docker Compose installed on your system
 - A running Firefly III instance
 - Personal Access Token from Firefly III
-- AI provider credentials (OpenAI API key or Ollama with appropriate model)
+- AI provider credentials (OpenAI API key or Ollama with appropriate model, or Gemini API key with appropriate model)
 
 ## Quick Start with Docker
 
@@ -99,11 +99,19 @@ OPENAI__APIKEY=sk-your-openai-api-key-here
 OPENAI__MODEL=gpt-4o-mini
 ```
 
+#### Using Gemini
+
+```env
+AIPROVIDER=Gemini
+GEMINI__APIKEY=your-gemini-api-key-here
+GEMINI__MODELID=gemini-2.5-flash-lite
+```
+
 #### Using Ollama (Local)
 
 ```env
 AIPROVIDER=Ollama
-OLLAMA__URI=http://ollama:11434
+OLLAMA__URL=http://ollama:11434
 OLLAMA__MODEL=gemma3:1b
 ```
 
