@@ -1,5 +1,9 @@
 # Firefly III AI Ingest
 
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/skb50bd/firefly-iii-ai-ingest/publish.yml)
+[![License](https://img.shields.io/github/license/skb50bd/firefly-iii-ai-ingest.svg)](./LICENSE)
+[![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/)
+
 A powerful .NET 9.0 web service that leverages AI to automatically categorize and create transactions in Firefly III from natural language descriptions. Transform your financial data entry with intelligent automation.
 
 ## 🚀 Features
@@ -582,7 +586,7 @@ dotnet test
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
 
 ## 🆘 Support
 
