@@ -10,10 +10,12 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Host=buddy-db;Database=firefly_buddy;Username=postgres;Password=password
     env_file:
       - .env
     depends_on:
-      - ollama
+      buddy-db:
+        condition: service_healthy
     networks:
       - firefly-network
     restart: unless-stopped
@@ -23,6 +25,31 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+
+  buddy-db:
+    container_name: buddy-db
+    image: postgres:17
+    volumes:
+    - ./buddy/db:/var/lib/postgresql/data
+    env_file: .db.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    cpus: 8
+    mem_limit: 8gb
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    networks:
+      - firefly-network
 
   ollama:
     container_name: ollama

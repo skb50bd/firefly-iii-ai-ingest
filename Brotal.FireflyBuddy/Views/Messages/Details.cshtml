@@ -1,0 +1,166 @@
+@model Brotal.FireflyBuddy.Data.IngestMessage
+@{
+    ViewData["Title"] = "Message Details";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-chat-text"></i> Message Details
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>ID:</strong></div>
+                    <div class="col-sm-9"><code>@Model.Id</code></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Text:</strong></div>
+                    <div class="col-sm-9">
+                        <div class="border p-3 bg-light rounded">
+                            @Model.Text
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Source:</strong></div>
+                    <div class="col-sm-9">
+                        <span class="badge bg-secondary">@(Model.Source ?? "Unknown")</span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Status:</strong></div>
+                    <div class="col-sm-9">
+                        <span class="badge bg-@GetStatusColor(Model.Status)">@Model.Status</span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Created:</strong></div>
+                    <div class="col-sm-9">@Model.CreatedAt.ToString("MMM dd, yyyy HH:mm:ss")</div>
+                </div>
+                @if (Model.ProcessedAt.HasValue)
+                {
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Processed:</strong></div>
+                        <div class="col-sm-9">@Model.ProcessedAt.Value.ToString("MMM dd, yyyy HH:mm:ss")</div>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(Model.ProcessingError))
+                {
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Error:</strong></div>
+                        <div class="col-sm-9">
+                            <div class="alert alert-danger">
+                                @Model.ProcessingError
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        @if (Model.AnalysisResult != null)
+        {
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="bi bi-brain"></i> AI Analysis
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2">
+                        <strong>Transactional:</strong>
+                        <span class="badge bg-@(Model.AnalysisResult.IsTransactional ? "success" : "danger")">
+                            @(Model.AnalysisResult.IsTransactional ? "Yes" : "No")
+                        </span>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Confident:</strong>
+                        <span class="badge bg-@(Model.AnalysisResult.IsConfident ? "success" : "warning")">
+                            @(Model.AnalysisResult.IsConfident ? "Yes" : "No")
+                        </span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.AnalysisResult.Reason))
+                    {
+                        <div>
+                            <strong>Reason:</strong>
+                            <p class="text-muted small">@Model.AnalysisResult.Reason</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        
+        @if (Model.TransactionDraft != null)
+        {
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="bi bi-file-earmark-text"></i> Transaction Draft
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2">
+                        <strong>Description:</strong>
+                        <p class="text-muted small">@Model.TransactionDraft.Description</p>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Amount:</strong>
+                        <span class="text-success fw-bold">@Model.TransactionDraft.Amount.ToString("C") @Model.TransactionDraft.CurrencyCode</span>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Type:</strong>
+                        <span class="badge bg-info">@Model.TransactionDraft.Type</span>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Status:</strong>
+                        <span class="badge bg-@GetDraftStatusColor(Model.TransactionDraft.Status)">@Model.TransactionDraft.Status</span>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="@Url.Action("Details", "Drafts", new { id = Model.TransactionDraft.Id })" class="btn btn-primary btn-sm">
+                            <i class="bi bi-eye"></i> View Draft
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="@Url.Action("Index")" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Messages
+    </a>
+</div>
+
+@functions {
+    string GetStatusColor(Brotal.FireflyBuddy.Data.MessageStatus status)
+    {
+        return status switch
+        {
+            Brotal.FireflyBuddy.Data.MessageStatus.Pending => "warning",
+            Brotal.FireflyBuddy.Data.MessageStatus.Processing => "info",
+            Brotal.FireflyBuddy.Data.MessageStatus.Processed => "success",
+            Brotal.FireflyBuddy.Data.MessageStatus.Failed => "danger",
+            Brotal.FireflyBuddy.Data.MessageStatus.Skipped => "secondary",
+            _ => "secondary"
+        };
+    }
+    
+    string GetDraftStatusColor(Brotal.FireflyBuddy.Data.DraftStatus status)
+    {
+        return status switch
+        {
+            Brotal.FireflyBuddy.Data.DraftStatus.Pending => "warning",
+            Brotal.FireflyBuddy.Data.DraftStatus.Ready => "success",
+            Brotal.FireflyBuddy.Data.DraftStatus.Submitted => "info",
+            Brotal.FireflyBuddy.Data.DraftStatus.Failed => "danger",
+            Brotal.FireflyBuddy.Data.DraftStatus.Cancelled => "secondary",
+            _ => "secondary"
+        };
+    }
+}

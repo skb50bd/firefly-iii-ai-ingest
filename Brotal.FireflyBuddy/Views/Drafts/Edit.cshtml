@@ -1,0 +1,137 @@
+@model Brotal.FireflyBuddy.Controllers.EditDraftViewModel
+@{
+    ViewData["Title"] = "Edit Draft";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-pencil"></i> Edit Transaction Draft
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label asp-for="Description" class="form-label">Description</label>
+                                <input asp-for="Description" class="form-control" />
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label asp-for="Amount" class="form-label">Amount</label>
+                                <input asp-for="Amount" class="form-control" type="number" step="0.01" />
+                                <span asp-validation-for="Amount" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Date" class="form-label">Date</label>
+                                <input asp-for="Date" class="form-control" type="datetime-local" />
+                                <span asp-validation-for="Date" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="SourceAccountName" class="form-label">Source Account</label>
+                                <input asp-for="SourceAccountName" class="form-control" />
+                                <span asp-validation-for="SourceAccountName" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="DestinationAccountName" class="form-label">Destination Account</label>
+                                <input asp-for="DestinationAccountName" class="form-control" />
+                                <span asp-validation-for="DestinationAccountName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="CategoryName" class="form-label">Category</label>
+                                <input asp-for="CategoryName" class="form-control" />
+                                <span asp-validation-for="CategoryName" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="BudgetName" class="form-label">Budget</label>
+                                <input asp-for="BudgetName" class="form-control" />
+                                <span asp-validation-for="BudgetName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="SubscriptionName" class="form-label">Subscription</label>
+                                <input asp-for="SubscriptionName" class="form-control" />
+                                <span asp-validation-for="SubscriptionName" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label asp-for="Tags" class="form-label">Tags (comma-separated)</label>
+                        <input asp-for="Tags" class="form-control" placeholder="AI, groceries, monthly" />
+                        <span asp-validation-for="Tags" class="text-danger"></span>
+                        <div class="form-text">Separate multiple tags with commas</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label asp-for="Notes" class="form-label">Notes</label>
+                        <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Notes" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label asp-for="ExternalUrl" class="form-label">External URL</label>
+                        <input asp-for="ExternalUrl" class="form-control" type="url" />
+                        <span asp-validation-for="ExternalUrl" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="@Url.Action("Details", new { id = Model.Id })" class="btn btn-secondary me-md-2">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-info-circle"></i> Editing Tips
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li>Make sure account names match exactly with your Firefly-III accounts</li>
+                    <li>Category and budget names should match your Firefly-III setup</li>
+                    <li>Tags will be automatically added to the transaction</li>
+                    <li>After saving, the draft will be marked as ready for submission</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

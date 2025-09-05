@@ -13,6 +13,19 @@
     <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="9.8.0-preview.1.25412.6" />
     <PackageReference Include="OllamaSharp" Version="5.3.6" />
     <PackageReference Include="OpenAI" Version="2.3.0" />
+    
+    <!-- EF Core and PostgreSQL -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.8" />
+    
+    <!-- TickerQ for job scheduling -->
+    <PackageReference Include="TickerQ" Version="2.4.0" />
+    <PackageReference Include="TickerQ.EntityFrameworkCore" Version="2.4.0" />
+    <PackageReference Include="TickerQ.Dashboard" Version="2.4.0" />
+    
+    <!-- MVC for web UI -->
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="9.0.8" />
   </ItemGroup>
 
 </Project>
