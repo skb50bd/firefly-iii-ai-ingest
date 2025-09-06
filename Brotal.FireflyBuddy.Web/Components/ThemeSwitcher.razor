@@ -1,0 +1,63 @@
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+@rendermode @(new InteractiveServerRenderMode())
+
+<div class="theme-toggle" @onclick="ToggleTheme">
+    <i class="bi @themeIcon" id="theme-icon"></i>
+</div>
+
+@code {
+    private string themeIcon = "bi-sun";
+    private bool isDarkMode = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadTheme();
+        }
+    }
+
+    private async Task LoadTheme()
+    {
+        try
+        {
+            var savedTheme = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "theme");
+            if (!string.IsNullOrEmpty(savedTheme))
+            {
+                isDarkMode = savedTheme == "dark";
+                await ApplyTheme();
+            }
+        }
+        catch
+        {
+            // Default to dark mode if localStorage is not available
+            isDarkMode = true;
+            await ApplyTheme();
+        }
+    }
+
+    private async Task ToggleTheme()
+    {
+        isDarkMode = !isDarkMode;
+        await ApplyTheme();
+    }
+
+    private async Task ApplyTheme()
+    {
+        try
+        {
+            themeIcon = isDarkMode ? "bi-moon" : "bi-sun";
+            var themeClass = isDarkMode ? "dark" : "light";
+            
+            await JSRuntime.InvokeVoidAsync("applyTheme", themeClass);
+            await JSRuntime.InvokeVoidAsync("localStorage.setItem", "theme", isDarkMode ? "dark" : "light");
+            
+            StateHasChanged();
+        }
+        catch
+        {
+            // Fallback if JS interop fails
+        }
+    }
+}

@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Brotal.FireflyBuddy.Web</RootNamespace>
+    <AssemblyName>Brotal.FireflyBuddy.Web</AssemblyName>
+    <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+    <UserSecretsId>16a01041-2cd6-403d-afc4-1ad406b32ca1</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.7.2" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Brotal.FireflyBuddy.Core\Brotal.FireflyBuddy.Core.csproj" />
+    <ProjectReference Include="..\Brotal.FireflyBuddy.ServiceDefaults\Brotal.FireflyBuddy.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+</Project>

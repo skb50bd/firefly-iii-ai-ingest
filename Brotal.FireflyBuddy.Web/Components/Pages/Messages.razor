@@ -1,0 +1,161 @@
+@page "/messages"
+@using Brotal.FireflyBuddy.Core.Data
+@using Brotal.FireflyBuddy.Core.Models.ViewModels
+@using Brotal.FireflyBuddy.Core.Repositories
+@using Microsoft.AspNetCore.Components.Web
+@inject IIngestMessageRepository MessageRepository
+@inject NavigationManager Navigation
+@rendermode @(new InteractiveServerRenderMode())
+
+<PageTitle>Messages</PageTitle>
+
+<div class="top-bar">
+    <div class="top-bar-left">
+        <h1 class="page-title">
+            <i class="bi bi-chat-text"></i> Messages
+        </h1>
+    </div>
+    <div class="top-bar-right">
+        <button class="btn btn-primary" @onclick="NavigateToCreate">
+            <i class="bi bi-plus-circle"></i> Add New Message
+        </button>
+    </div>
+</div>
+
+@if (viewModel?.Messages.Any() == true)
+{
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Text</th>
+                            <th>Source</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Processed</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var message in viewModel.Messages)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="text-truncate" style="max-width: 300px;" title="@message.Text">
+                                        @message.Text
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge badge-secondary">@(message.Source ?? "Unknown")</span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-@GetStatusColor(message.Status)">@message.Status</span>
+                                </td>
+                                <td>
+                                    <small class="text-muted">@message.CreatedAt.ToString("MMM dd, HH:mm")</small>
+                                </td>
+                                <td>
+                                    @if (message.ProcessedAt.HasValue)
+                                    {
+                                        <small class="text-muted">@message.ProcessedAt.Value.ToString("MMM dd, HH:mm")</small>
+                                    }
+                                    else
+                                    {
+                                        <small class="text-muted">-</small>
+                                    }
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm" @onclick="() => NavigateToDetails(message.Id)">
+                                        <i class="bi bi-eye"></i> View
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @if (viewModel.CurrentPage > 1 || viewModel.Messages.Count == viewModel.PageSize)
+    {
+        <div class="d-flex justify-content-center gap-md mt-lg">
+            @if (viewModel.CurrentPage > 1)
+            {
+                <button class="btn" @onclick="() => NavigateToPage(viewModel.CurrentPage - 1)">
+                    <i class="bi bi-chevron-left"></i> Previous
+                </button>
+            }
+            <span class="btn btn-primary">@viewModel.CurrentPage</span>
+            @if (viewModel.Messages.Count == viewModel.PageSize)
+            {
+                <button class="btn" @onclick="() => NavigateToPage(viewModel.CurrentPage + 1)">
+                    Next <i class="bi bi-chevron-right"></i>
+                </button>
+            }
+        </div>
+    }
+}
+else
+{
+    <div class="card">
+        <div class="card-body text-center">
+            <div class="empty-state">
+                <i class="bi bi-chat-text empty-icon"></i>
+                <h4>No messages yet</h4>
+                <p class="text-secondary">Start by adding your first message to begin processing transactions.</p>
+                <button class="btn btn-primary" @onclick="NavigateToCreate">
+                    <i class="bi bi-plus-circle"></i> Add Your First Message
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private MessagesIndexViewModel? viewModel;
+    private int currentPage = 1;
+    private int pageSize = 20;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMessages();
+    }
+
+    private async Task LoadMessages()
+    {
+        var skip = (currentPage - 1) * pageSize;
+        var messages = await MessageRepository.GetAllAsync(skip, pageSize, CancellationToken.None);
+
+        viewModel = new MessagesIndexViewModel
+        {
+            Messages = messages.ToList(),
+            CurrentPage = currentPage,
+            PageSize = pageSize
+        };
+    }
+
+    private async Task NavigateToPage(int page)
+    {
+        currentPage = page;
+        await LoadMessages();
+    }
+
+    private void NavigateToDetails(Guid id) => Navigation.NavigateTo($"/messages/{id}");
+    private void NavigateToCreate() => Navigation.NavigateTo("/messages/create");
+
+    private static string GetStatusColor(MessageStatus status)
+    {
+        return status switch
+        {
+            MessageStatus.Pending => "warning",
+            MessageStatus.Processing => "info",
+            MessageStatus.Processed => "success",
+            MessageStatus.Failed => "danger",
+            MessageStatus.Skipped => "secondary",
+            _ => "secondary"
+        };
+    }
+}

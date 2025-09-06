@@ -1,0 +1,201 @@
+@page "/messages/{Id:guid}"
+@using Brotal.FireflyBuddy.Core.Data
+@using Brotal.FireflyBuddy.Core.Repositories
+@using Microsoft.AspNetCore.Components.Web
+@inject IIngestMessageRepository MessageRepository
+@inject NavigationManager Navigation
+@rendermode @(new InteractiveServerRenderMode())
+
+<PageTitle>Message Details</PageTitle>
+
+@if (message == null)
+{
+    <div class="loading text-center">
+        <div class="spinner"></div>
+        <p class="text-secondary">Loading message...</p>
+    </div>
+}
+else
+{
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <h1 class="page-title">
+                <i class="bi bi-chat-text"></i> Message Details
+            </h1>
+        </div>
+        <div class="top-bar-right">
+            <button class="btn" @onclick="NavigateBack">
+                <i class="bi bi-arrow-left"></i> Back to Messages
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Message Content</h5>
+                </div>
+                <div class="card-body">
+                    <div class="message-content">
+                        <p class="message-text">@message.Text</p>
+                        <div class="message-meta">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <strong>Source:</strong> @(message.Source ?? "Unknown")
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Status:</strong>
+                                    <span class="badge badge-@GetStatusColor(message.Status)">@message.Status</span>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-sm-6">
+                                    <strong>Created:</strong> @message.CreatedAt.ToString("MMM dd, yyyy HH:mm")
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Processed:</strong>
+                                    @if (message.ProcessedAt.HasValue)
+                                    {
+                                        @message.ProcessedAt.Value.ToString("MMM dd, yyyy HH:mm")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Not processed</span>
+                                    }
+                                </div>
+                            </div>
+                            @if (!string.IsNullOrEmpty(message.ExternalId))
+                            {
+                                <div class="row mt-2">
+                                    <div class="col-sm-6">
+                                        <strong>External ID:</strong> @message.ExternalId
+                                    </div>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(message.ProcessingError))
+                            {
+                                <div class="row mt-2">
+                                    <div class="col-12">
+                                        <strong>Error:</strong>
+                                        <div class="alert alert-danger mt-1">@message.ProcessingError</div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            @if (message.AnalysisResult != null)
+            {
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">Analysis Result</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="analysis-info">
+                            <div class="mb-2">
+                                <strong>Transactional:</strong>
+                                <span class="badge badge-@(message.AnalysisResult.IsTransactional ? "success" : "secondary")">
+                                    @(message.AnalysisResult.IsTransactional ? "Yes" : "No")
+                                </span>
+                            </div>
+                            <div class="mb-2">
+                                <strong>Confident:</strong>
+                                <span class="badge badge-@(message.AnalysisResult.IsConfident ? "success" : "warning")">
+                                    @(message.AnalysisResult.IsConfident ? "Yes" : "No")
+                                </span>
+                            </div>
+                            @if (!string.IsNullOrEmpty(message.AnalysisResult.Reason))
+                            {
+                                <div>
+                                    <strong>Reason:</strong>
+                                    <p class="mt-1">@message.AnalysisResult.Reason</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (message.TransactionDraft != null)
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">Transaction Draft</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="draft-info">
+                            <div class="mb-2">
+                                <strong>Description:</strong> @message.TransactionDraft.Description
+                            </div>
+                            <div class="mb-2">
+                                <strong>Amount:</strong> @message.TransactionDraft.Amount.ToString("C") @message.TransactionDraft.CurrencyCode
+                            </div>
+                            <div class="mb-2">
+                                <strong>Type:</strong> @message.TransactionDraft.Type
+                            </div>
+                            <div class="mb-2">
+                                <strong>Status:</strong>
+                                <span class="badge badge-@GetDraftStatusColor(message.TransactionDraft.Status)">
+                                    @message.TransactionDraft.Status
+                                </span>
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-primary btn-sm" @onclick="() => NavigateToDraft(message.TransactionDraft.Id)">
+                                    <i class="bi bi-eye"></i> View Draft
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    private IngestMessage? message;
+
+    protected override async Task OnInitializedAsync()
+    {
+        message = await MessageRepository.GetByIdAsync(Id, CancellationToken.None);
+        if (message == null)
+        {
+            Navigation.NavigateTo("/messages");
+        }
+    }
+
+    private void NavigateBack() => Navigation.NavigateTo("/messages");
+    private void NavigateToDraft(Guid draftId) => Navigation.NavigateTo($"/drafts/{draftId}");
+
+    private static string GetStatusColor(MessageStatus status)
+    {
+        return status switch
+        {
+            MessageStatus.Pending => "warning",
+            MessageStatus.Processing => "info",
+            MessageStatus.Processed => "success",
+            MessageStatus.Failed => "danger",
+            MessageStatus.Skipped => "secondary",
+            _ => "secondary"
+        };
+    }
+
+    private static string GetDraftStatusColor(DraftStatus status)
+    {
+        return status switch
+        {
+            DraftStatus.Pending => "warning",
+            DraftStatus.Ready => "success",
+            DraftStatus.Submitted => "info",
+            DraftStatus.Failed => "danger",
+            DraftStatus.Cancelled => "secondary",
+            _ => "secondary"
+        };
+    }
+}

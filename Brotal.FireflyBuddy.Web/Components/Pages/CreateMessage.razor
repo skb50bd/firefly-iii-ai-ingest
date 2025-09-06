@@ -1,0 +1,140 @@
+@page "/messages/create"
+@using Brotal.FireflyBuddy.Core.Data
+@using Brotal.FireflyBuddy.Core.Models.ViewModels
+@using Brotal.FireflyBuddy.Core.Repositories
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Forms
+@inject IIngestMessageRepository MessageRepository
+@inject NavigationManager Navigation
+@inject ILogger<CreateMessage> Logger
+@rendermode @(new InteractiveServerRenderMode())
+
+<PageTitle>Create Message</PageTitle>
+
+<div class="top-bar">
+    <div class="top-bar-left">
+        <h1 class="page-title">
+            <i class="bi bi-plus-circle"></i> Create New Message
+        </h1>
+    </div>
+    <div class="top-bar-right">
+        <button class="btn" @onclick="NavigateBack">
+            <i class="bi bi-arrow-left"></i> Back to Messages
+        </button>
+    </div>
+</div>
+
+<div class="form-container">
+    <div class="form-card">
+        <div class="form-header">
+            <h2 class="form-title">
+                <i class="bi bi-chat-text"></i> Message Details
+            </h2>
+        </div>
+        <div class="form-body">
+            <EditForm Model="@model" OnValidSubmit="@HandleSubmit">
+                <DataAnnotationsValidator />
+
+                <div class="form-group">
+                    <label for="text" class="form-label">Message Text <span class="text-danger">*</span></label>
+                    <InputTextArea @bind-Value="model.Text"
+                                 class="form-control"
+                                 id="text"
+                                 rows="4"
+                                 placeholder="Enter your message text here..." />
+                    <ValidationMessage For="@(() => model.Text)" class="form-error" />
+                    <div class="form-help">Maximum 4000 characters. Current: @model.Text?.Length characters</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="source" class="form-label">Source</label>
+                    <InputText @bind-Value="model.Source"
+                              class="form-control"
+                              id="source"
+                              placeholder="e.g., SMS, Email, Manual" />
+                    <ValidationMessage For="@(() => model.Source)" class="form-error" />
+                    <div class="form-help">Optional source identifier for the message</div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+                        @if (isSubmitting)
+                        {
+                            <i class="bi bi-hourglass-split"></i> @("Creating")
+                        }
+                        else
+                        {
+                            <i class="bi bi-check-circle"></i> @("Create Message")
+                        }
+                    </button>
+                    <button type="button" class="btn" @onclick="NavigateBack">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+
+    <div class="info-card">
+        <div class="info-header">
+            <h3 class="info-title">
+                <i class="bi bi-lightbulb"></i> Tips for Better Processing
+            </h3>
+        </div>
+        <div class="info-body">
+            <ul class="info-list">
+                <li>
+                    <strong>Include clear transaction amounts and descriptions</strong>
+                </li>
+                <li>
+                    <strong>Mention account names or categories when possible</strong>
+                </li>
+                <li>
+                    <strong>Include dates if different from today</strong>
+                </li>
+                <li>
+                    <strong>Be specific about transaction types (purchase, transfer, etc.)</strong>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+@code {
+    private CreateMessageViewModel model = new();
+    private bool isSubmitting = false;
+
+    private async Task HandleSubmit()
+    {
+        if (isSubmitting) return;
+
+        isSubmitting = true;
+
+        try
+        {
+            var message = new IngestMessage
+            {
+                Text = model.Text,
+                Source = model.Source ?? "Manual",
+                Status = MessageStatus.Pending
+            };
+
+            await MessageRepository.CreateAsync(message, CancellationToken.None);
+
+            Logger.LogInformation("Created new message with ID: {MessageId}", message.Id);
+
+            Navigation.NavigateTo($"/messages/{message.Id}");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error creating message");
+            // In a real app, you'd show an error message to the user
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void NavigateBack() => Navigation.NavigateTo("/messages");
+}

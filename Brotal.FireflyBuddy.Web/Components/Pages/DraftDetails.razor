@@ -1,0 +1,218 @@
+@page "/drafts/{Id:guid}"
+@using Brotal.FireflyBuddy.Core.Data
+@using Brotal.FireflyBuddy.Core.Repositories
+@using Microsoft.AspNetCore.Components.Web
+@inject ITransactionDraftRepository DraftRepository
+@inject NavigationManager Navigation
+@rendermode @(new InteractiveServerRenderMode())
+
+<PageTitle>Draft Details</PageTitle>
+
+@if (draft == null)
+{
+    <div class="loading text-center">
+        <div class="spinner"></div>
+        <p class="text-secondary">Loading draft...</p>
+    </div>
+}
+else
+{
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <h1 class="page-title">
+                <i class="bi bi-file-earmark-text"></i> Draft Details
+            </h1>
+        </div>
+        <div class="top-bar-right">
+            <div class="d-flex gap-sm">
+                @if (draft.Status == DraftStatus.Ready)
+                {
+                    <button class="btn btn-primary" @onclick="() => NavigateToEdit(draft.Id)">
+                        <i class="bi bi-pencil"></i> Edit Draft
+                    </button>
+                }
+                <button class="btn" @onclick="NavigateBack">
+                    <i class="bi bi-arrow-left"></i> Back to Drafts
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Transaction Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Description</label>
+                                <p class="form-control-plaintext">@draft.Description</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Amount</label>
+                                <p class="form-control-plaintext">
+                                    <strong class="fs-5">@draft.Amount.ToString("C") @draft.CurrencyCode</strong>
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Type</label>
+                                <p class="form-control-plaintext">
+                                    <span class="badge badge-info">@draft.Type</span>
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Date</label>
+                                <p class="form-control-plaintext">@draft.Date.ToString("MMM dd, yyyy")</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Source Account</label>
+                                <p class="form-control-plaintext">@(string.IsNullOrEmpty(draft.SourceAccountName) ? "Not specified" : draft.SourceAccountName)</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Destination Account</label>
+                                <p class="form-control-plaintext">@(string.IsNullOrEmpty(draft.DestinationAccountName) ? "Not specified" : draft.DestinationAccountName)</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Category</label>
+                                <p class="form-control-plaintext">@(string.IsNullOrEmpty(draft.CategoryName) ? "Not specified" : draft.CategoryName)</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Budget</label>
+                                <p class="form-control-plaintext">@(string.IsNullOrEmpty(draft.BudgetName) ? "Not specified" : draft.BudgetName)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(draft.Notes))
+                    {
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Notes</label>
+                            <p class="form-control-plaintext">@draft.Notes</p>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(draft.Tags))
+                    {
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tags</label>
+                            <p class="form-control-plaintext">@draft.Tags</p>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(draft.SubscriptionName))
+                    {
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Subscription</label>
+                            <p class="form-control-plaintext">@draft.SubscriptionName</p>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(draft.ExternalUrl))
+                    {
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">External URL</label>
+                            <p class="form-control-plaintext">
+                                <a href="@draft.ExternalUrl" target="_blank" class="text-decoration-none">
+                                    @draft.ExternalUrl <i class="bi bi-box-arrow-up-right"></i>
+                                </a>
+                            </p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">Status Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="status-info">
+                        <div class="mb-2">
+                            <strong>Status:</strong>
+                            <span class="badge badge-@GetDraftStatusColor(draft.Status)">@draft.Status</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Created:</strong> @draft.CreatedAt.ToString("MMM dd, yyyy HH:mm")
+                        </div>
+                        @if (draft.SubmittedAt.HasValue)
+                        {
+                            <div class="mb-2">
+                                <strong>Submitted:</strong> @draft.SubmittedAt.Value.ToString("MMM dd, yyyy HH:mm")
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(draft.FireflyTransactionId))
+                        {
+                            <div class="mb-2">
+                                <strong>Firefly ID:</strong> @draft.FireflyTransactionId
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(draft.SubmissionError))
+                        {
+                            <div class="mb-2">
+                                <strong>Error:</strong>
+                                <div class="alert alert-danger mt-1 small">@draft.SubmissionError</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            @if (draft.IngestMessage != null)
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">Source Message</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="message-info">
+                            <p class="message-text small">@draft.IngestMessage.Text</p>
+                            <div class="mt-2">
+                                <button class="btn btn-sm" @onclick="() => NavigateToMessage(draft.IngestMessage.Id)">
+                                    <i class="bi bi-eye"></i> View Message
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    private TransactionDraft? draft;
+
+    protected override async Task OnInitializedAsync()
+    {
+        draft = await DraftRepository.GetByIdAsync(Id, CancellationToken.None);
+        if (draft == null)
+        {
+            Navigation.NavigateTo("/drafts");
+        }
+    }
+
+    private void NavigateBack() => Navigation.NavigateTo("/drafts");
+    private void NavigateToEdit(Guid draftId) => Navigation.NavigateTo($"/drafts/{draftId}/edit");
+    private void NavigateToMessage(Guid messageId) => Navigation.NavigateTo($"/messages/{messageId}");
+
+    private static string GetDraftStatusColor(DraftStatus status)
+    {
+        return status switch
+        {
+            DraftStatus.Pending => "warning",
+            DraftStatus.Ready => "success",
+            DraftStatus.Submitted => "info",
+            DraftStatus.Failed => "danger",
+            DraftStatus.Cancelled => "secondary",
+            _ => "secondary"
+        };
+    }
+}

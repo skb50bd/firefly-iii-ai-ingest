@@ -3,18 +3,32 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36401.2
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Brotal.FireflyBuddy", "Brotal.FireflyBuddy\Brotal.FireflyBuddy.csproj", "{7CA5E262-7369-A127-B7B8-F25CC538AFA2}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 	ProjectSection(SolutionItems) = preProject
 		.dockerignore = .dockerignore
 		.env = .env
 		.gitignore = .gitignore
 		compose.yml = compose.yml
-		Dockerfile = Dockerfile
 		env.example = env.example
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Brotal.FireflyBuddy.Web", "Brotal.FireflyBuddy.Web\Brotal.FireflyBuddy.Web.csproj", "{3BA64553-C410-232A-8B92-070A09FCD2C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Brotal.FireflyBuddy.Core", "Brotal.FireflyBuddy.Core\Brotal.FireflyBuddy.Core.csproj", "{04DB0B8A-22DA-4BC1-B5E3-D4F2D1510226}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\publish.yml = .github\workflows\publish.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{185D9B2D-C26E-4DBD-B39F-F00A7097FDEB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Brotal.FireflyBuddy.AppHost", "Brotal.FireflyBuddy.AppHost\Brotal.FireflyBuddy.AppHost.csproj", "{DAB7B3A4-212C-4CF7-8735-7ED0C1C6DDB4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Brotal.FireflyBuddy.ServiceDefaults", "Brotal.FireflyBuddy.ServiceDefaults\Brotal.FireflyBuddy.ServiceDefaults.csproj", "{58AA9A8C-33FE-A843-500C-EEDEC51A385D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Brotal.FireflyBuddy.Worker", "Brotal.FireflyBuddy.Worker\Brotal.FireflyBuddy.Worker.csproj", "{8A2F619F-7A07-94CB-3065-C081A171F5FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,13 +36,33 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7CA5E262-7369-A127-B7B8-F25CC538AFA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7CA5E262-7369-A127-B7B8-F25CC538AFA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7CA5E262-7369-A127-B7B8-F25CC538AFA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7CA5E262-7369-A127-B7B8-F25CC538AFA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BA64553-C410-232A-8B92-070A09FCD2C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BA64553-C410-232A-8B92-070A09FCD2C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BA64553-C410-232A-8B92-070A09FCD2C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BA64553-C410-232A-8B92-070A09FCD2C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04DB0B8A-22DA-4BC1-B5E3-D4F2D1510226}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04DB0B8A-22DA-4BC1-B5E3-D4F2D1510226}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04DB0B8A-22DA-4BC1-B5E3-D4F2D1510226}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04DB0B8A-22DA-4BC1-B5E3-D4F2D1510226}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAB7B3A4-212C-4CF7-8735-7ED0C1C6DDB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAB7B3A4-212C-4CF7-8735-7ED0C1C6DDB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAB7B3A4-212C-4CF7-8735-7ED0C1C6DDB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAB7B3A4-212C-4CF7-8735-7ED0C1C6DDB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58AA9A8C-33FE-A843-500C-EEDEC51A385D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58AA9A8C-33FE-A843-500C-EEDEC51A385D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58AA9A8C-33FE-A843-500C-EEDEC51A385D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58AA9A8C-33FE-A843-500C-EEDEC51A385D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A2F619F-7A07-94CB-3065-C081A171F5FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A2F619F-7A07-94CB-3065-C081A171F5FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A2F619F-7A07-94CB-3065-C081A171F5FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A2F619F-7A07-94CB-3065-C081A171F5FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {185D9B2D-C26E-4DBD-B39F-F00A7097FDEB}
+		{185D9B2D-C26E-4DBD-B39F-F00A7097FDEB} = {8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0EEF01D5-E1FA-4FFB-8CAA-E8F5660DBE1C}

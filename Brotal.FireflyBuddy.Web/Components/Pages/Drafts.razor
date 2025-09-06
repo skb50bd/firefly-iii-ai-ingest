@@ -1,0 +1,190 @@
+@page "/drafts"
+@using Brotal.FireflyBuddy.Core.Data
+@using Brotal.FireflyBuddy.Core.Models.ViewModels
+@using Brotal.FireflyBuddy.Core.Repositories
+@using Microsoft.AspNetCore.Components.Web
+@inject ITransactionDraftRepository DraftRepository
+@inject NavigationManager Navigation
+@rendermode @(new InteractiveServerRenderMode())
+
+<PageTitle>Drafts</PageTitle>
+
+<div class="top-bar">
+    <div class="top-bar-left">
+        <h1 class="page-title">
+            <i class="bi bi-file-earmark-text"></i> Transaction Drafts
+        </h1>
+    </div>
+    <div class="top-bar-right">
+        <select class="form-control" style="width: auto;" @onchange="FilterByStatus">
+            <option value="">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="Ready">Ready</option>
+            <option value="Submitted">Submitted</option>
+            <option value="Failed">Failed</option>
+            <option value="Cancelled">Cancelled</option>
+        </select>
+    </div>
+</div>
+
+@if (viewModel?.Drafts.Any() == true)
+{
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var draft in viewModel.Drafts)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="text-truncate" style="max-width: 300px;" title="@draft.Description">
+                                        @draft.Description
+                                    </div>
+                                </td>
+                                <td>
+                                    <strong>@draft.Amount.ToString("C") @draft.CurrencyCode</strong>
+                                </td>
+                                <td>
+                                    <span class="badge badge-info">@draft.Type</span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-@GetDraftStatusColor(draft.Status)">@draft.Status</span>
+                                </td>
+                                <td>
+                                    <small class="text-muted">@draft.CreatedAt.ToString("MMM dd, HH:mm")</small>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-sm">
+                                        <button class="btn btn-sm" @onclick="() => NavigateToDetails(draft.Id)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        @if (draft.Status == DraftStatus.Ready)
+                                        {
+                                            <button class="btn btn-sm btn-success" @onclick="() => NavigateToEdit(draft.Id)">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @if (viewModel.CurrentPage > 1 || viewModel.Drafts.Count == viewModel.PageSize)
+    {
+        <div class="d-flex justify-content-center gap-md mt-lg">
+            @if (viewModel.CurrentPage > 1)
+            {
+                <button class="btn" @onclick="() => NavigateToPage(viewModel.CurrentPage - 1)">
+                    <i class="bi bi-chevron-left"></i> Previous
+                </button>
+            }
+            <span class="btn btn-primary">@viewModel.CurrentPage</span>
+            @if (viewModel.Drafts.Count == viewModel.PageSize)
+            {
+                <button class="btn" @onclick="() => NavigateToPage(viewModel.CurrentPage + 1)">
+                    Next <i class="bi bi-chevron-right"></i>
+                </button>
+            }
+        </div>
+    }
+}
+else
+{
+    <div class="card">
+        <div class="card-body text-center">
+            <div class="empty-state">
+                <i class="bi bi-file-earmark-text empty-icon"></i>
+                <h4>No drafts yet</h4>
+                <p class="text-secondary">Transaction drafts will appear here after messages are processed by AI.</p>
+                <button class="btn btn-primary" @onclick="NavigateToMessages">
+                    <i class="bi bi-chat-text"></i> View Messages
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private DraftsIndexViewModel? viewModel;
+    private int currentPage = 1;
+    private int pageSize = 20;
+    private DraftStatus? statusFilter;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDrafts();
+    }
+
+    private async Task LoadDrafts()
+    {
+        var skip = (currentPage - 1) * pageSize;
+        var drafts = await DraftRepository.GetAllAsync(skip, pageSize, CancellationToken.None);
+
+        // Apply status filter if selected
+        if (statusFilter.HasValue)
+        {
+            drafts = drafts.Where(d => d.Status == statusFilter.Value);
+        }
+
+        viewModel = new DraftsIndexViewModel
+        {
+            Drafts = drafts.ToList(),
+            CurrentPage = currentPage,
+            PageSize = pageSize
+        };
+    }
+
+    private async Task NavigateToPage(int page)
+    {
+        currentPage = page;
+        await LoadDrafts();
+    }
+
+    private async Task FilterByStatus(ChangeEventArgs e)
+    {
+        if (string.IsNullOrEmpty(e.Value?.ToString()))
+        {
+            statusFilter = null;
+        }
+        else if (Enum.TryParse<DraftStatus>(e.Value.ToString(), out var status))
+        {
+            statusFilter = status;
+        }
+
+        currentPage = 1;
+        await LoadDrafts();
+    }
+
+    private void NavigateToDetails(Guid id) => Navigation.NavigateTo($"/drafts/{id}");
+    private void NavigateToEdit(Guid id) => Navigation.NavigateTo($"/drafts/{id}/edit");
+    private void NavigateToMessages() => Navigation.NavigateTo("/messages");
+
+    private static string GetDraftStatusColor(DraftStatus status)
+    {
+        return status switch
+        {
+            DraftStatus.Pending => "warning",
+            DraftStatus.Ready => "success",
+            DraftStatus.Submitted => "info",
+            DraftStatus.Failed => "danger",
+            DraftStatus.Cancelled => "secondary",
+            _ => "secondary"
+        };
+    }
+}

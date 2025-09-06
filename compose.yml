@@ -26,6 +26,33 @@ services:
       retries: 3
       start_period: 40s
 
+  firefly-buddy-worker:
+    container_name: firefly-buddy-worker
+    image: ghcr.io/skb50bd/firefly-buddy-worker:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5001:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Host=buddy-db;Database=firefly_buddy;Username=postgres;Password=password
+    env_file:
+      - .env
+    depends_on:
+      buddy-db:
+        condition: service_healthy
+    networks:
+      - firefly-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
   buddy-db:
     container_name: buddy-db
     image: postgres:17
