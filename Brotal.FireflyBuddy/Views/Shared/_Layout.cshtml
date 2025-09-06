@@ -3,75 +3,104 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="AI-powered financial transaction analyzer for Firefly-III" />
+    <meta name="keywords" content="firefly-iii, finance, ai, transactions, budgeting" />
+    <meta name="author" content="Firefly Buddy" />
     <title>@ViewData["Title"] - Firefly Buddy</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="~/css/site.css" rel="stylesheet" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-dark bg-primary">
-            <div class="container">
-                <a class="navbar-brand" href="@Url.Action("Index", "Home")">
-                    <i class="bi bi-fire"></i> Firefly Buddy
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link" href="@Url.Action("Index", "Home")">
-                                <i class="bi bi-house"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="@Url.Action("Index", "Messages")">
-                                <i class="bi bi-chat-text"></i> Messages
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="@Url.Action("Index", "Drafts")">
-                                <i class="bi bi-file-earmark-text"></i> Drafts
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/tickerq-dashboard" target="_blank">
-                                <i class="bi bi-gear"></i> Jobs Dashboard
-                            </a>
-                        </li>
-                    </ul>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">🔥</div>
+                    <div class="sidebar-logo-text">Firefly Buddy</div>
+                </div>
+                <div class="sidebar-user">admin@fireflybuddy.com</div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="@Url.Action("Index", "Home")" class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")">
+                        <i class="bi bi-house nav-item-icon"></i>
+                        Dashboard
+                    </a>
+                    <a href="@Url.Action("Index", "Messages")" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Messages" ? "active" : "")">
+                        <i class="bi bi-chat-text nav-item-icon"></i>
+                        Messages
+                    </a>
+                    <a href="@Url.Action("Index", "Drafts")" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Drafts" ? "active" : "")">
+                        <i class="bi bi-file-earmark-text nav-item-icon"></i>
+                        Drafts
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">System</div>
+                    <a href="/tickerq" target="_blank" class="nav-item">
+                        <i class="bi bi-gear nav-item-icon"></i>
+                        Jobs Dashboard
+                    </a>
+                    <a href="/scalar/v1" target="_blank" class="nav-item">
+                        <i class="bi bi-gear nav-item-icon"></i>
+                        API Dashboard
+                    </a>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="nav-section">
+                    <a href="#" class="nav-item">
+                        <i class="bi bi-gear nav-item-icon"></i>
+                        Settings
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="bi bi-question-circle nav-item-icon"></i>
+                        Help Center
+                    </a>
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="top-bar-left">
+                    <h1 class="page-title">@ViewData["Title"]</h1>
+                </div>
+                <div class="top-bar-right">
+                    <button class="theme-toggle" onclick="toggleTheme()">
+                        <i class="bi bi-sun" id="theme-icon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Alerts -->
             @if (TempData["SuccessMessage"] != null)
             {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <div class="alert alert-success">
                     <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             }
             @if (TempData["ErrorMessage"] != null)
             {
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <div class="alert alert-danger">
                     <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             }
+
+            <!-- Page Content -->
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - Firefly Buddy - <a href="https://github.com/firefly-iii/firefly-iii">Firefly-III Companion</a>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

@@ -6,8 +6,6 @@ using Brotal.FireflyBuddy.Repositories;
 using Brotal.FireflyBuddy.Services;
 using Brotal.FireflyIII.Client;
 using Brotal.FireflyIII.Extensions;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using TickerQ.Dashboard.DependencyInjection;
@@ -87,9 +85,7 @@ builder.Services.AddTickerQ(options =>
         uiopt.BasePath              = "/jobs";
         uiopt.EnableBuiltInAuth     = true;
         uiopt.UseHostAuthentication = false;
-        uiopt.RequiredPolicies      = ["Admin"];
-        uiopt.RequiredPolicies      = ["JobsDashboardAccess"];
-
+        uiopt.RequiredPolicies      = ["Admin", "JobsDashboardAccess"];
     });
 });
 

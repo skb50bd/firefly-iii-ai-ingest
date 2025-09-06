@@ -3,57 +3,55 @@
     ViewData["Title"] = "Add New Message";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="bi bi-plus-circle"></i> Add New Message
-                </h5>
-            </div>
-            <div class="card-body">
-                <form asp-action="Create" method="post">
-                    <div class="mb-3">
-                        <label asp-for="Text" class="form-label">Message Text</label>
-                        <textarea asp-for="Text" class="form-control" rows="5" placeholder="Enter your message, receipt text, or transaction description..."></textarea>
-                        <span asp-validation-for="Text" class="text-danger"></span>
-                        <div class="form-text">This could be SMS text, email content, receipt OCR, or any transaction description.</div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label asp-for="Source" class="form-label">Source (Optional)</label>
-                        <input asp-for="Source" class="form-control" placeholder="e.g., SMS, Email, Manual, Receipt" />
-                        <span asp-validation-for="Source" class="text-danger"></span>
-                        <div class="form-text">Specify where this message came from for better tracking.</div>
-                    </div>
-                    
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="@Url.Action("Index")" class="btn btn-secondary me-md-2">
-                            <i class="bi bi-arrow-left"></i> Cancel
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-send"></i> Submit Message
-                        </button>
-                    </div>
-                </form>
-            </div>
+<div class="form-container">
+    <div class="form-card">
+        <div class="form-header">
+            <h2 class="form-title">
+                <i class="bi bi-plus-circle"></i> Add New Message
+            </h2>
         </div>
-        
-        <div class="card mt-3">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-info-circle"></i> How it works
-                </h6>
-            </div>
-            <div class="card-body">
-                <ol>
-                    <li><strong>Submit:</strong> Your message will be queued for AI analysis</li>
-                    <li><strong>Analyze:</strong> Our AI will determine if it's a financial transaction</li>
-                    <li><strong>Draft:</strong> If transactional, a draft will be created for your review</li>
-                    <li><strong>Review:</strong> You can edit the draft before submitting to Firefly-III</li>
-                    <li><strong>Submit:</strong> Once approved, the transaction is sent to Firefly-III</li>
-                </ol>
-            </div>
+        <div class="form-body">
+            <form asp-action="Create" method="post">
+                <div class="form-group">
+                    <label asp-for="Text" class="form-label">Message Text</label>
+                    <textarea asp-for="Text" class="form-control" rows="6" placeholder="Enter your message, receipt text, or transaction description..."></textarea>
+                    <span asp-validation-for="Text" class="form-error"></span>
+                    <div class="form-help">This could be SMS text, email content, receipt OCR, or any transaction description.</div>
+                </div>
+                
+                <div class="form-group">
+                    <label asp-for="Source" class="form-label">Source (Optional)</label>
+                    <input asp-for="Source" class="form-control" placeholder="e.g., SMS, Email, Manual, Receipt" />
+                    <span asp-validation-for="Source" class="form-error"></span>
+                    <div class="form-help">Specify where this message came from for better tracking.</div>
+                </div>
+                
+                <div class="form-actions">
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send"></i> Submit Message
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="info-card">
+        <div class="info-header">
+            <h3 class="info-title">
+                <i class="bi bi-info-circle"></i> How it works
+            </h3>
+        </div>
+        <div class="info-body">
+            <ol class="info-list">
+                <li><strong>Submit:</strong> Your message will be queued for AI analysis</li>
+                <li><strong>Analyze:</strong> Our AI will determine if it's a financial transaction</li>
+                <li><strong>Draft:</strong> If transactional, a draft will be created for your review</li>
+                <li><strong>Review:</strong> You can edit the draft before submitting to Firefly-III</li>
+                <li><strong>Submit:</strong> Once approved, the transaction is sent to Firefly-III</li>
+            </ol>
         </div>
     </div>
 </div>
