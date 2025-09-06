@@ -29,6 +29,8 @@ services:
   buddy-db:
     container_name: buddy-db
     image: postgres:17
+    ports:
+      - "5432:5432"
     volumes:
     - ./buddy/db:/var/lib/postgresql/data
     env_file: .db.env

@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Brotal.FireflyBuddy.Data;
+using TickerQ.EntityFrameworkCore.Configurations;
 
 namespace Brotal.FireflyBuddy.Data;
 
@@ -17,24 +17,32 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        // Set default schema for all entities
+        modelBuilder.HasDefaultSchema("buddy");
+
+        modelBuilder.ApplyConfiguration(new TimeTickerConfigurations());
+        modelBuilder.ApplyConfiguration(new CronTickerConfigurations());
+        modelBuilder.ApplyConfiguration(new CronTickerOccurrenceConfigurations());
+
         // Configure IngestMessage
         modelBuilder.Entity<IngestMessage>(entity =>
         {
+            entity.ToTable("IngestMessages", "buddy");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Text).IsRequired().HasMaxLength(4000);
             entity.Property(e => e.Source).HasMaxLength(100);
             entity.Property(e => e.ExternalId).HasMaxLength(500);
             entity.Property(e => e.ProcessingError).HasMaxLength(1000);
-            
+
             entity.HasIndex(e => e.CreatedAt);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.ExternalId).IsUnique().HasFilter("\"ExternalId\" IS NOT NULL");
-            
+
             entity.HasOne(e => e.AnalysisResult)
                   .WithOne(e => e.IngestMessage)
                   .HasForeignKey<AnalysisResult>(e => e.IngestMessageId)
                   .OnDelete(DeleteBehavior.Cascade);
-                  
+
             entity.HasOne(e => e.TransactionDraft)
                   .WithOne(e => e.IngestMessage)
                   .HasForeignKey<TransactionDraft>(e => e.IngestMessageId)
@@ -44,9 +52,10 @@ public class ApplicationDbContext : DbContext
         // Configure AnalysisResult
         modelBuilder.Entity<AnalysisResult>(entity =>
         {
+            entity.ToTable("AnalysisResults", "buddy");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Reason).HasMaxLength(1000);
-            
+
             entity.HasIndex(e => e.CreatedAt);
             entity.HasIndex(e => e.IsTransactional);
             entity.HasIndex(e => e.IsConfident);
@@ -55,6 +64,7 @@ public class ApplicationDbContext : DbContext
         // Configure TransactionDraft
         modelBuilder.Entity<TransactionDraft>(entity =>
         {
+            entity.ToTable("TransactionDrafts", "buddy");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Description).IsRequired().HasMaxLength(500);
             entity.Property(e => e.CurrencyCode).IsRequired().HasMaxLength(3);
@@ -68,9 +78,9 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.ExternalUrl).HasMaxLength(500);
             entity.Property(e => e.FireflyTransactionId).HasMaxLength(100);
             entity.Property(e => e.SubmissionError).HasMaxLength(1000);
-            
+
             entity.Property(e => e.Amount).HasColumnType("decimal(18,2)");
-            
+
             entity.HasIndex(e => e.CreatedAt);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.Type);

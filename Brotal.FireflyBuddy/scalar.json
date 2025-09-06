@@ -1,0 +1,41 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Firefly Buddy API",
+    "description": "AI-powered financial transaction ingestion and management API for Firefly-III",
+    "version": "v1.0.0",
+    "contact": {
+      "name": "Firefly Buddy Support",
+      "email": "support@fireflybuddy.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://localhost:7000",
+      "description": "Development server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Messages",
+      "description": "Operations related to message ingestion and processing"
+    },
+    {
+      "name": "Drafts",
+      "description": "Operations related to transaction drafts"
+    },
+    {
+      "name": "Health",
+      "description": "Health check endpoints"
+    },
+    {
+      "name": "Legacy",
+      "description": "Legacy API endpoints for backward compatibility"
+    }
+  ],
+  "x-scalar-ignore": {
+    "tags": [
+      "TickerQ"
+    ]
+  }
+}

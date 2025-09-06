@@ -12,7 +12,7 @@ public class IngestMessageRepository : IIngestMessageRepository
         _context = context;
     }
 
-    public async Task<IngestMessage?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Data.IngestMessage?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _context.IngestMessages
             .Include(m => m.AnalysisResult)
@@ -20,7 +20,7 @@ public class IngestMessageRepository : IIngestMessageRepository
             .FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
     }
 
-    public async Task<IEnumerable<IngestMessage>> GetAllAsync(int skip = 0, int take = 50, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Data.IngestMessage>> GetAllAsync(int skip = 0, int take = 50, CancellationToken cancellationToken = default)
     {
         return await _context.IngestMessages
             .Include(m => m.AnalysisResult)
@@ -31,7 +31,7 @@ public class IngestMessageRepository : IIngestMessageRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<IngestMessage>> GetByStatusAsync(MessageStatus status, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Data.IngestMessage>> GetByStatusAsync(Data.MessageStatus status, CancellationToken cancellationToken = default)
     {
         return await _context.IngestMessages
             .Include(m => m.AnalysisResult)
@@ -41,14 +41,14 @@ public class IngestMessageRepository : IIngestMessageRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IngestMessage> CreateAsync(IngestMessage message, CancellationToken cancellationToken = default)
+    public async Task<Data.IngestMessage> CreateAsync(Data.IngestMessage message, CancellationToken cancellationToken = default)
     {
         _context.IngestMessages.Add(message);
         await _context.SaveChangesAsync(cancellationToken);
         return message;
     }
 
-    public async Task<IngestMessage> UpdateAsync(IngestMessage message, CancellationToken cancellationToken = default)
+    public async Task<Data.IngestMessage> UpdateAsync(Data.IngestMessage message, CancellationToken cancellationToken = default)
     {
         _context.IngestMessages.Update(message);
         await _context.SaveChangesAsync(cancellationToken);
@@ -81,14 +81,14 @@ public class TransactionDraftRepository : ITransactionDraftRepository
         _context = context;
     }
 
-    public async Task<TransactionDraft?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Data.TransactionDraft?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _context.TransactionDrafts
             .Include(d => d.IngestMessage)
             .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
     }
 
-    public async Task<IEnumerable<TransactionDraft>> GetAllAsync(int skip = 0, int take = 50, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Data.TransactionDraft>> GetAllAsync(int skip = 0, int take = 50, CancellationToken cancellationToken = default)
     {
         return await _context.TransactionDrafts
             .Include(d => d.IngestMessage)
@@ -98,7 +98,7 @@ public class TransactionDraftRepository : ITransactionDraftRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<TransactionDraft>> GetByStatusAsync(DraftStatus status, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Data.TransactionDraft>> GetByStatusAsync(Data.DraftStatus status, CancellationToken cancellationToken = default)
     {
         return await _context.TransactionDrafts
             .Include(d => d.IngestMessage)
@@ -107,14 +107,14 @@ public class TransactionDraftRepository : ITransactionDraftRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<TransactionDraft> CreateAsync(TransactionDraft draft, CancellationToken cancellationToken = default)
+    public async Task<Data.TransactionDraft> CreateAsync(Data.TransactionDraft draft, CancellationToken cancellationToken = default)
     {
         _context.TransactionDrafts.Add(draft);
         await _context.SaveChangesAsync(cancellationToken);
         return draft;
     }
 
-    public async Task<TransactionDraft> UpdateAsync(TransactionDraft draft, CancellationToken cancellationToken = default)
+    public async Task<Data.TransactionDraft> UpdateAsync(Data.TransactionDraft draft, CancellationToken cancellationToken = default)
     {
         _context.TransactionDrafts.Update(draft);
         await _context.SaveChangesAsync(cancellationToken);
@@ -131,7 +131,7 @@ public class TransactionDraftRepository : ITransactionDraftRepository
         }
     }
 
-    public async Task<IEnumerable<TransactionDraft>> GetPendingDraftsAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Data.TransactionDraft>> GetPendingDraftsAsync(CancellationToken cancellationToken = default)
     {
         return await _context.TransactionDrafts
             .Include(d => d.IngestMessage)
@@ -150,21 +150,21 @@ public class AnalysisResultRepository : IAnalysisResultRepository
         _context = context;
     }
 
-    public async Task<AnalysisResult?> GetByMessageIdAsync(Guid messageId, CancellationToken cancellationToken = default)
+    public async Task<Data.AnalysisResult?> GetByMessageIdAsync(Guid messageId, CancellationToken cancellationToken = default)
     {
         return await _context.AnalysisResults
             .Include(a => a.IngestMessage)
             .FirstOrDefaultAsync(a => a.IngestMessageId == messageId, cancellationToken);
     }
 
-    public async Task<AnalysisResult> CreateAsync(AnalysisResult result, CancellationToken cancellationToken = default)
+    public async Task<Data.AnalysisResult> CreateAsync(Data.AnalysisResult result, CancellationToken cancellationToken = default)
     {
         _context.AnalysisResults.Add(result);
         await _context.SaveChangesAsync(cancellationToken);
         return result;
     }
 
-    public async Task<AnalysisResult> UpdateAsync(AnalysisResult result, CancellationToken cancellationToken = default)
+    public async Task<Data.AnalysisResult> UpdateAsync(Data.AnalysisResult result, CancellationToken cancellationToken = default)
     {
         _context.AnalysisResults.Update(result);
         await _context.SaveChangesAsync(cancellationToken);

@@ -1,0 +1,37 @@
+You are a senior .NET Web Developer with a passion for building scalable and efficient web applications and you have an extensive knowledge of building useful and modern looking web applications.
+
+You are very good with working with AI services like OpenAI and Ollama.
+
+The goal is to build a web application that uses AI to analyze financial messages, receipts, and transaction descriptions, then automatically creates transaction drafts for your review and approval.
+
+The application will be built with ASP.NET Core 9.0 and will use the following technologies:
+- ASP.NET Core 9.0
+- Entity Framework Core
+- PostgreSQL
+- TickerQ
+- HTML, CSS, JavaScript, SVG
+- OpenAI
+- Ollama
+
+Functional Requirements:
+- The application will receive messages from a variety of sources, including SMS, Email, and manual input.
+- The requests will be sent to the application via a REST API.
+- The requests will be validated and persisted to the database.
+- A background job will be monitoring the database for messages that need to be processed and will analyze them using the AI service and create transaction drafts.
+- The transaction drafts will be persisted to the database and will be displayed in the web application.
+- The user will be able to review the transaction drafts, make changes to them, and approve or reject them.
+- The approved transaction drafts will be submitted to the Firefly-III API.
+
+Non-Functional Requirements:
+- The application should be scalable and efficient.
+- The application should be secure and reliable.
+- The code should be clean and well-organized.
+- The code should be well-documented.
+- The code should be easy to understand and maintain.
+- The code should be easy to test.
+- The code should be easy to deploy.
+- The code should be easy to scale.
+- The code should be easy to debug.
+- The code should be easy to monitor.
+- The code should be easy to secure.
+- The code should be easy to maintain.
