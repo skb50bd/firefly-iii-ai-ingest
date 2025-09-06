@@ -20,10 +20,6 @@ public class ApplicationDbContext : DbContext
         // Set default schema for all entities
         modelBuilder.HasDefaultSchema("buddy");
 
-        modelBuilder.ApplyConfiguration(new TimeTickerConfigurations());
-        modelBuilder.ApplyConfiguration(new CronTickerConfigurations());
-        modelBuilder.ApplyConfiguration(new CronTickerOccurrenceConfigurations());
-
         // Configure IngestMessage
         modelBuilder.Entity<IngestMessage>(entity =>
         {

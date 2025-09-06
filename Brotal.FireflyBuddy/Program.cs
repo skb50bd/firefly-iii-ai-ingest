@@ -74,18 +74,28 @@ builder.Services.AddApi(options =>
 // Add TickerQ for background job processing
 builder.Services.AddTickerQ(options =>
 {
-    options.SetMaxConcurrency(5);
+    options.SetMaxConcurrency(maxConcurrency: 5);
+
+    options.UpdateMissedJobCheckDelay(TimeSpan.FromMinutes(60));
+
     options.AddOperationalStore<ApplicationDbContext>(efOpt =>
     {
         efOpt.UseModelCustomizerForMigrations();
+
+        // On app start, cancel tickers left in Expired or InProgress (terminated) states
+        // to prevent duplicate re-execution after crashes or abrupt shutdowns.
         efOpt.CancelMissedTickersOnAppStart();
+        efOpt.IgnoreSeedMemoryCronTickers();
     });
+
     options.AddDashboard(uiopt =>
     {
-        uiopt.BasePath              = "/jobs";
-        uiopt.EnableBuiltInAuth     = true;
-        uiopt.UseHostAuthentication = false;
-        uiopt.RequiredPolicies      = ["Admin", "JobsDashboardAccess"];
+        uiopt.BasePath               = "/jobs";
+        uiopt.EnableBuiltInAuth      = true;
+        uiopt.UseHostAuthentication  = false;
+        //uiopt.RequiredRoles          = ["Admin", "Ops"];
+        //uiopt.RequiredPolicies       = ["JobsDashboardAccess"];
+        uiopt.EnableBasicAuth        = true;
     });
 });
 
@@ -124,7 +134,8 @@ app.MapControllers();
 // Map MVC controllers
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}"
+);
 
 // Initialize TickerQ
 app.UseTickerQ();
